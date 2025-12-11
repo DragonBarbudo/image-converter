@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to WebP Converter - API & Web Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .language-selector {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .language-selector:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .docs-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #333;
+            margin: 30px 0 15px 0;
+            font-size: 22px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #667eea;
+            margin: 20px 0 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .file-input-label:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .file-input-label.has-file {
+            background: #e7f3ff;
+            border-color: #667eea;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .resize-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.error {
+            background: #ffe0e0;
+            color: #c00;
+        }
+
+        .result.success {
+            background: #e7ffe0;
+            color: #2d5016;
+        }
+
+        .result-image {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .result-image img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-info {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .result-info div {
+            margin: 5px 0;
+        }
+
+        .download-btn {
+            margin-top: 15px;
+            background: #28a745;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        /* Documentation Styles */
+        .doc-section {
+            margin-bottom: 30px;
+        }
+
+        .doc-section p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .code-inline {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .param-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .param-item {
+            margin-bottom: 12px;
+            color: #333;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .param-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .param-name {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 15px;
+        }
+
+        .param-type {
+            color: #999;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .param-desc {
+            color: #666;
+            font-size: 13px;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        .endpoint {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .feature-list {
+            list-style: none;
+            color: #666;
+            margin: 15px 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 30px 0;
+        }
+
+        .example-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .example-section h4 {
+            color: #28a745;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .n8n-badge {
+            display: inline-block;
+            background: #FF6B6B;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+            font-weight: 700;
+        }
+
+        .n8n-section {
+            background: #FFF5F5;
+            border-left: 4px solid #FF6B6B;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .step-box {
+            background: #f0f8ff;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .step-box strong {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .resize-options {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+            }
+
+            .container, .docs-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-top">
+        <div></div>
+        <select class="language-selector" id="languageSelector" onchange="changeLanguage(this.value)">
+            <option value="en">🇬🇧 English</option>
+            <option value="es">🇪🇸 Español</option>
+        </select>
+    </div>
+
+    <div class="header">
+        <h1 data-i18n="title">🖼️ Image to WebP Converter</h1>
+        <p data-i18n="subtitle">Convert images to WebP format with optional resizing - Fast, Easy & Free</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('converter')" data-i18n="tabConverter">🔄 Converter</button>
+        <button class="tab-button" onclick="switchTab('docs')" data-i18n="tabDocs">📚 API Documentation</button>
+    </div>
+
+    <div class="content-wrapper">
+        <!-- Converter Tab -->
+        <div id="converter" class="tab-content active">
+            <div class="container">
+                <h1 data-i18n="convertTitle">Convert Your Image</h1>
+                <p class="subtitle" data-i18n="convertSubtitle">Upload an image and convert it to WebP format with optional resizing</p>
+
+                <form id="convertForm">
+                    <div class="form-group">
+                        <label data-i18n="selectImage">Select Image</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="imageFile" accept="image/*" required>
+                            <label for="imageFile" class="file-input-label" id="fileLabel">
+                                <div>
+                                    <div style="font-size: 40px; margin-bottom: 10px;">📁</div>
+                                    <div data-i18n="dragDrop">Click to select an image or drag and drop</div>
+                                    <div style="font-size: 12px; color: #999; margin-top: 5px;" data-i18n="supportedFormats">
+                                        Supports: JPG, PNG, GIF, TIFF, WebP, and more
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="resizeOptions">Resize Options (Optional)</label>
+                        <div class="resize-options">
+                            <div>
+                                <label style="font-size: 12px; color: #666;" data-i18n="maxWidth">Max Width (px)</label>
+                                <input type="number" id="maxWidth" placeholder="e.g., 1920" min="1">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; color: #666;" data-i18n="maxHeight">Max Height (px)</label>
+                                <input type="number" id="maxHeight" placeholder="e.g., 1080" min="1">
+                            </div>
+                        </div>
+                        <p style="font-size: 12px; color: #666; margin-top: 8px;" data-i18n="aspectRatioNote">
+                            Leave empty to keep original size. Aspect ratio will be preserved.
+                        </p>
+                    </div>
+
+                    <button type="submit" id="convertBtn" data-i18n="convertBtn">Convert to WebP</button>
+                </form>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px; color: #666;" data-i18n="converting">Converting image...</p>
+                </div>
+
+                <div class="result" id="result">
+                    <div id="resultMessage"></div>
+                    <div class="result-info" id="resultInfo"></div>
+                    <div class="result-image" id="resultImage"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Documentation Tab -->
+        <div id="docs" class="tab-content">
+            <div class="docs-container">
+                <h1 data-i18n="apiTitle">API Documentation</h1>
+                <p class="subtitle" data-i18n="apiSubtitle">Learn how to integrate the Image to WebP Converter API into your application</p>
+
+                <!-- Quick Start -->
+                <div class="doc-section">
+                    <h2 data-i18n="quickStart">Quick Start</h2>
+                    <p data-i18n="quickStartText">Convert an image in one request:</p>
+                    <div class="code-block">curl -X POST https://your-domain.netlify.app/api/convert-image \
+  -F "image=@photo.jpg" \
+  -o converted.webp</div>
+                </div>
+
+                <!-- API Endpoint -->
+                <div class="doc-section">
+                    <h2 data-i18n="endpoint">Endpoint</h2>
+                    <div class="endpoint">POST /api/convert-image</div>
+                    <p data-i18n="baseUrlInfo">Replace <code style="color: #667eea;">your-domain.netlify.app</code> with your actual domain.</p>
+                </div>
+
+                <!-- Request -->
+                <div class="doc-section">
+                    <h2 data-i18n="requestSection">Request</h2>
+                    <p data-i18n="requestInfo">Send <span class="code-inline">multipart/form-data</span> with these fields:</p>
+                    <div class="param-list">
+                        <div class="param-item">
+                            <div class="param-name">image *</div>
+                            <div class="param-type" data-i18n="typeFile">FILE</div>
+                            <div class="param-desc" data-i18n="paramImage">The image file to convert. Accepts JPG, PNG, GIF, TIFF, WebP, etc.</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">maxWidth</div>
+                            <div class="param-type" data-i18n="typeNumber">NUMBER</div>
+                            <div class="param-desc" data-i18n="paramWidth">Maximum width in pixels. Optional. Image scales proportionally if larger.</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">maxHeight</div>
+                            <div class="param-type" data-i18n="typeNumber">NUMBER</div>
+                            <div class="param-desc" data-i18n="paramHeight">Maximum height in pixels. Optional. Image scales proportionally if larger.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response -->
+                <div class="doc-section">
+                    <h2 data-i18n="responseSection">Response</h2>
+                    <p data-i18n="responseInfo">Successful conversion returns the WebP image with metadata in headers:</p>
+                    <div class="param-list">
+                        <div class="param-item">
+                            <div class="param-name">Content-Type</div>
+                            <div class="param-desc">image/webp</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">X-Original-Width</div>
+                            <div class="param-desc" data-i18n="headerOrigWidth">Original image width in pixels</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">X-Original-Height</div>
+                            <div class="param-desc" data-i18n="headerOrigHeight">Original image height in pixels</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">X-Final-Width</div>
+                            <div class="param-desc" data-i18n="headerFinalWidth">Final image width in pixels</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">X-Final-Height</div>
+                            <div class="param-desc" data-i18n="headerFinalHeight">Final image height in pixels</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Usage Examples -->
+                <div class="doc-section">
+                    <h2 data-i18n="examples">Code Examples</h2>
+
+                    <div class="example-section">
+                        <h4 data-i18n="exampleCurl">cURL</h4>
+                        <div class="code-block">curl -X POST https://your-domain.netlify.app/api/convert-image \
+  -F "image=@photo.jpg" \
+  -F "maxWidth=1920" \
+  -o converted.webp</div>
+                    </div>
+
+                    <div class="example-section">
+                        <h4 data-i18n="exampleJs">JavaScript / Node.js</h4>
+                        <div class="code-block">const formData = new FormData();
+formData.append('image', fileInput.files[0]);
+formData.append('maxWidth', '1920');
+
+const response = await fetch('https://your-domain.netlify.app/api/convert-image', {
+  method: 'POST',
+  body: formData
+});
+
+const blob = await response.blob();</div>
+                    </div>
+
+                    <div class="example-section">
+                        <h4 data-i18n="examplePython">Python</h4>
+                        <div class="code-block">import requests
+
+files = {'image': open('photo.jpg', 'rb')}
+data = {'maxWidth': '1920', 'maxHeight': '1080'}
+
+response = requests.post(
+  'https://your-domain.netlify.app/api/convert-image',
+  files=files,
+  data=data
+)
+
+with open('converted.webp', 'wb') as f:
+    f.write(response.content)</div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- n8n Integration -->
+                <div class="doc-section">
+                    <h2><span class="n8n-badge">n8n</span> <span data-i18n="n8nIntegration">Integration</span></h2>
+                    <p data-i18n="n8nIntro">Automate image conversion in your n8n workflows.</p>
+
+                    <h3 data-i18n="n8nSteps">Setup Steps</h3>
+                    <div class="step-box">
+                        <strong>1.</strong> <span data-i18n="n8nStep1">Add an HTTP Request node</span>
+                    </div>
+                    <div class="step-box">
+                        <strong>2.</strong> <span data-i18n="n8nStep2">Set Method: POST</span>
+                    </div>
+                    <div class="step-box">
+                        <strong>3.</strong> <span data-i18n="n8nStep3">Set URL: https://your-domain.netlify.app/api/convert-image</span>
+                    </div>
+                    <div class="step-box">
+                        <strong>4.</strong> <span data-i18n="n8nStep4">Body Type: Form Data (Multipart)</span>
+                    </div>
+
+                    <h3 data-i18n="n8nUseCase">Common Use Cases</h3>
+                    <ul class="feature-list">
+                        <li data-i18n="n8nUse1">Batch convert images from a folder</li>
+                        <li data-i18n="n8nUse2">Auto-convert images from email attachments</li>
+                        <li data-i18n="n8nUse3">Sync and resize images from Google Drive</li>
+                        <li data-i18n="n8nUse4">Create webhook for on-demand conversions</li>
+                        <li data-i18n="n8nUse5">Send converted images to Slack/Discord</li>
+                    </ul>
+
+                    <h3 data-i18n="n8nFormData">Form Data Fields</h3>
+                    <div class="param-list">
+                        <div class="param-item">
+                            <div class="param-name">image</div>
+                            <div class="param-type" data-i18n="typeBinary">BINARY</div>
+                            <div class="param-desc" data-i18n="n8nParamImage">Connect from "Read Binary File" or other file source</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">maxWidth</div>
+                            <div class="param-type" data-i18n="typeNumber">NUMBER</div>
+                            <div class="param-desc" data-i18n="n8nParamWidth">e.g., {{1920}}</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">maxHeight</div>
+                            <div class="param-type" data-i18n="typeNumber">NUMBER</div>
+                            <div class="param-desc" data-i18n="n8nParamHeight">e.g., {{1080}}</div>
+                        </div>
+                    </div>
+
+                    <h3 data-i18n="n8nOutput">Access Response Data</h3>
+                    <div class="code-block">// Image dimensions
+{{$json.headers["x-original-width"]}}
+{{$json.headers["x-original-height"]}}
+{{$json.headers["x-final-width"]}}
+{{$json.headers["x-final-height"]}}
+
+// Binary data for saving
+{{$json.body}}</div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Status Codes -->
+                <div class="doc-section">
+                    <h2 data-i18n="statusCodes">Status Codes</h2>
+                    <div class="param-list">
+                        <div class="param-item">
+                            <div class="param-name">200</div>
+                            <div class="param-desc" data-i18n="status200">Success - WebP image returned</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">400</div>
+                            <div class="param-desc" data-i18n="status400">Bad Request - Missing image or invalid parameters</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">405</div>
+                            <div class="param-desc" data-i18n="status405">Method Not Allowed - Use POST only</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">500</div>
+                            <div class="param-desc" data-i18n="status500">Server Error - Check image format and size</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Limits -->
+                <div class="doc-section">
+                    <h2 data-i18n="limits">Limits & Info</h2>
+                    <ul class="feature-list">
+                        <li data-i18n="limit1">Max file size: 6MB</li>
+                        <li data-i18n="limit2">WebP quality: 80</li>
+                        <li data-i18n="limit3">Timeout: 30 seconds</li>
+                        <li data-i18n="limit4">Formats: JPG, PNG, GIF, TIFF, WebP, SVG, BMP, ICO, HEIF</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                title: "🖼️ Image to WebP Converter",
+                subtitle: "Convert images to WebP format with optional resizing - Fast, Easy & Free",
+                tabConverter: "🔄 Converter",
+                tabDocs: "📚 API Documentation",
+                convertTitle: "Convert Your Image",
+                convertSubtitle: "Upload an image and convert it to WebP format with optional resizing",
+                selectImage: "Select Image",
+                dragDrop: "Click to select an image or drag and drop",
+                supportedFormats: "Supports: JPG, PNG, GIF, TIFF, WebP, and more",
+                resizeOptions: "Resize Options (Optional)",
+                maxWidth: "Max Width (px)",
+                maxHeight: "Max Height (px)",
+                aspectRatioNote: "Leave empty to keep original size. Aspect ratio will be preserved.",
+                convertBtn: "Convert to WebP",
+                converting: "Converting image...",
+                apiTitle: "API Documentation",
+                apiSubtitle: "Integrate the Image to WebP Converter API into your application",
+                quickStart: "Quick Start",
+                quickStartText: "Convert an image in one request:",
+                endpoint: "Endpoint",
+                baseUrlInfo: "Replace your-domain.netlify.app with your actual domain.",
+                requestSection: "Request",
+                requestInfo: "Send multipart/form-data with these fields:",
+                typeFile: "FILE",
+                typeNumber: "NUMBER",
+                typeBinary: "BINARY",
+                paramImage: "The image file to convert. Accepts JPG, PNG, GIF, TIFF, WebP, etc.",
+                paramWidth: "Maximum width in pixels. Optional. Image scales proportionally if larger.",
+                paramHeight: "Maximum height in pixels. Optional. Image scales proportionally if larger.",
+                responseSection: "Response",
+                responseInfo: "Successful conversion returns the WebP image with metadata in headers:",
+                headerOrigWidth: "Original image width in pixels",
+                headerOrigHeight: "Original image height in pixels",
+                headerFinalWidth: "Final image width in pixels",
+                headerFinalHeight: "Final image height in pixels",
+                examples: "Code Examples",
+                exampleCurl: "cURL",
+                exampleJs: "JavaScript / Node.js",
+                examplePython: "Python",
+                n8nIntegration: "Integration",
+                n8nIntro: "Automate image conversion in your n8n workflows.",
+                n8nSteps: "Setup Steps",
+                n8nStep1: "Add an HTTP Request node",
+                n8nStep2: "Set Method: POST",
+                n8nStep3: "Set URL: https://your-domain.netlify.app/api/convert-image",
+                n8nStep4: "Body Type: Form Data (Multipart)",
+                n8nUseCase: "Common Use Cases",
+                n8nUse1: "Batch convert images from a folder",
+                n8nUse2: "Auto-convert images from email attachments",
+                n8nUse3: "Sync and resize images from Google Drive",
+                n8nUse4: "Create webhook for on-demand conversions",
+                n8nUse5: "Send converted images to Slack/Discord",
+                n8nFormData: "Form Data Fields",
+                n8nParamImage: "Connect from 'Read Binary File' or other file source",
+                n8nParamWidth: "e.g., {{1920}}",
+                n8nParamHeight: "e.g., {{1080}}",
+                n8nOutput: "Access Response Data",
+                statusCodes: "Status Codes",
+                status200: "Success - WebP image returned",
+                status400: "Bad Request - Missing image or invalid parameters",
+                status405: "Method Not Allowed - Use POST only",
+                status500: "Server Error - Check image format and size",
+                limits: "Limits & Info",
+                limit1: "Max file size: 6MB",
+                limit2: "WebP quality: 80",
+                limit3: "Timeout: 30 seconds",
+                limit4: "Formats: JPG, PNG, GIF, TIFF, WebP, SVG, BMP, ICO, HEIF"
+            },
+            es: {
+                title: "🖼️ Convertidor de Imágenes a WebP",
+                subtitle: "Convierte imágenes a WebP con redimensionamiento opcional - Rápido, Fácil y Gratuito",
+                tabConverter: "🔄 Convertidor",
+                tabDocs: "📚 Documentación de API",
+                convertTitle: "Convierte Tu Imagen",
+                convertSubtitle: "Sube una imagen y conviértela a formato WebP con redimensionamiento opcional",
+                selectImage: "Seleccionar Imagen",
+                dragDrop: "Haz clic para seleccionar una imagen o arrastra y suelta",
+                supportedFormats: "Compatible con: JPG, PNG, GIF, TIFF, WebP y más",
+                resizeOptions: "Opciones de Redimensionamiento (Opcional)",
+                maxWidth: "Ancho Máximo (px)",
+                maxHeight: "Altura Máxima (px)",
+                aspectRatioNote: "Deja vacío para mantener el tamaño original. La relación de aspecto se preservará.",
+                convertBtn: "Convertir a WebP",
+                converting: "Convirtiendo imagen...",
+                apiTitle: "Documentación de API",
+                apiSubtitle: "Integra el API del Convertidor de Imágenes a WebP en tu aplicación",
+                quickStart: "Inicio Rápido",
+                quickStartText: "Convierte una imagen en una solicitud:",
+                endpoint: "Endpoint",
+                baseUrlInfo: "Reemplaza your-domain.netlify.app con tu dominio real.",
+                requestSection: "Solicitud",
+                requestInfo: "Envía multipart/form-data con estos campos:",
+                typeFile: "ARCHIVO",
+                typeNumber: "NÚMERO",
+                typeBinary: "BINARIO",
+                paramImage: "El archivo de imagen a convertir. Acepta JPG, PNG, GIF, TIFF, WebP, etc.",
+                paramWidth: "Ancho máximo en píxeles. Opcional. La imagen se escala proporcionalmente si es mayor.",
+                paramHeight: "Altura máxima en píxeles. Opcional. La imagen se escala proporcionalmente si es mayor.",
+                responseSection: "Respuesta",
+                responseInfo: "La conversión exitosa devuelve la imagen WebP con metadatos en los encabezados:",
+                headerOrigWidth: "Ancho original de la imagen en píxeles",
+                headerOrigHeight: "Altura original de la imagen en píxeles",
+                headerFinalWidth: "Ancho final de la imagen en píxeles",
+                headerFinalHeight: "Altura final de la imagen en píxeles",
+                examples: "Ejemplos de Código",
+                exampleCurl: "cURL",
+                exampleJs: "JavaScript / Node.js",
+                examplePython: "Python",
+                n8nIntegration: "Integración",
+                n8nIntro: "Automatiza la conversión de imágenes en tus flujos de trabajo de n8n.",
+                n8nSteps: "Pasos de Configuración",
+                n8nStep1: "Agrega un nodo HTTP Request",
+                n8nStep2: "Establece Método: POST",
+                n8nStep3: "Establece URL: https://your-domain.netlify.app/api/convert-image",
+                n8nStep4: "Tipo de Cuerpo: Form Data (Multipart)",
+                n8nUseCase: "Casos de Uso Comunes",
+                n8nUse1: "Convierte por lotes imágenes de una carpeta",
+                n8nUse2: "Convierte automáticamente imágenes de adjuntos de correo",
+                n8nUse3: "Sincroniza y redimensiona imágenes de Google Drive",
+                n8nUse4: "Crea webhook para conversiones bajo demanda",
+                n8nUse5: "Envía imágenes convertidas a Slack/Discord",
+                n8nFormData: "Campos de Datos de Formulario",
+                n8nParamImage: "Conecta desde 'Read Binary File' u otra fuente de archivo",
+                n8nParamWidth: "p. ej., {{1920}}",
+                n8nParamHeight: "p. ej., {{1080}}",
+                n8nOutput: "Acceder a Datos de Respuesta",
+                statusCodes: "Códigos de Estado",
+                status200: "Éxito - Imagen WebP devuelta",
+                status400: "Solicitud Incorrecta - Imagen faltante o parámetros inválidos",
+                status405: "Método No Permitido - Usar solo POST",
+                status500: "Error del Servidor - Verifica el formato y tamaño de la imagen",
+                limits: "Límites e Información",
+                limit1: "Tamaño máximo: 6MB",
+                limit2: "Calidad WebP: 80",
+                limit3: "Tiempo de espera: 30 segundos",
+                limit4: "Formatos: JPG, PNG, GIF, TIFF, WebP, SVG, BMP, ICO, HEIF"
+            }
+        };
+
+        let currentLanguage = 'en';
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            updatePageText();
+        }
+
+        function updatePageText() {
+            const t = translations[currentLanguage];
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (t[key]) {
+                    element.textContent = t[key];
+                }
+            });
+        }
+
+        const savedLanguage = localStorage.getItem('language') || 'en';
+        currentLanguage = savedLanguage;
+        document.getElementById('languageSelector').value = savedLanguage;
+        updatePageText();
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        const form = document.getElementById('convertForm');
+        const imageFile = document.getElementById('imageFile');
+        const fileLabel = document.getElementById('fileLabel');
+        const maxWidth = document.getElementById('maxWidth');
+        const maxHeight = document.getElementById('maxHeight');
+        const convertBtn = document.getElementById('convertBtn');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const resultMessage = document.getElementById('resultMessage');
+        const resultInfo = document.getElementById('resultInfo');
+        const resultImage = document.getElementById('resultImage');
+
+        imageFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileLabel.classList.add('has-file');
+                fileLabel.innerHTML = `
+                    <div>
+                        <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
+                        <div><strong>${file.name}</strong></div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            ${(file.size / 1024 / 1024).toFixed(2)} MB
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        fileLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#667eea';
+            fileLabel.style.background = '#e9ecef';
+        });
+
+        fileLabel.addEventListener('dragleave', () => {
+            fileLabel.style.borderColor = '#dee2e6';
+            fileLabel.style.background = '#f8f9fa';
+        });
+
+        fileLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#dee2e6';
+            fileLabel.style.background = '#f8f9fa';
+            if (e.dataTransfer.files.length > 0) {
+                imageFile.files = e.dataTransfer.files;
+                imageFile.dispatchEvent(new Event('change'));
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const file = imageFile.files[0];
+            if (!file) {
+                showError('Please select an image file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            if (maxWidth.value) {
+                formData.append('maxWidth', maxWidth.value);
+            }
+
+            if (maxHeight.value) {
+                formData.append('maxHeight', maxHeight.value);
+            }
+
+            loading.classList.add('show');
+            result.classList.remove('show');
+            convertBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/convert-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Conversion failed');
+                }
+
+                const blob = await response.blob();
+                const imageUrl = URL.createObjectURL(blob);
+
+                const originalWidth = response.headers.get('X-Original-Width');
+                const originalHeight = response.headers.get('X-Original-Height');
+                const finalWidth = response.headers.get('X-Final-Width');
+                const finalHeight = response.headers.get('X-Final-Height');
+
+                showSuccess(imageUrl, {
+                    originalWidth,
+                    originalHeight,
+                    finalWidth,
+                    finalHeight,
+                    originalSize: file.size,
+                    finalSize: blob.size,
+                    filename: file.name
+                });
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loading.classList.remove('show');
+                convertBtn.disabled = false;
+            }
+        });
+
+        function showError(message) {
+            result.classList.add('show', 'error');
+            result.classList.remove('success');
+            resultMessage.innerHTML = `<strong>❌ Error:</strong> ${message}`;
+            resultInfo.innerHTML = '';
+            resultImage.innerHTML = '';
+        }
+
+        function showSuccess(imageUrl, metadata) {
+            result.classList.add('show', 'success');
+            result.classList.remove('error');
+            
+            resultMessage.innerHTML = '<strong>✅ Conversion Successful!</strong>';
+            
+            const sizeDiff = ((1 - metadata.finalSize / metadata.originalSize) * 100).toFixed(1);
+            const resized = metadata.originalWidth !== metadata.finalWidth || 
+                           metadata.originalHeight !== metadata.finalHeight;
+            
+            resultInfo.innerHTML = `
+                <div>
+                    <span class="info-badge">Original</span> 
+                    ${metadata.originalWidth} × ${metadata.originalHeight} px 
+                    (${(metadata.originalSize / 1024 / 1024).toFixed(2)} MB)
+                </div>
+                <div>
+                    <span class="info-badge">WebP</span> 
+                    ${metadata.finalWidth} × ${metadata.finalHeight} px 
+                    (${(metadata.finalSize / 1024 / 1024).toFixed(2)} MB)
+                </div>
+                <div style="margin-top: 10px; font-weight: 600; color: #28a745;">
+                    ${sizeDiff > 0 ? `📉 ${sizeDiff}% smaller` : ''}
+                    ${resized ? ' • Image resized' : ''}
+                </div>
+            `;
+            
+            resultImage.innerHTML = `
+                <img src="${imageUrl}" alt="Converted image">
+                <button class="download-btn" onclick="downloadImage('${imageUrl}', '${metadata.filename}')">
+                    ⬇️ Download WebP Image
+                </button>
+            `;
+        }
+
+        function downloadImage(url, originalFilename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = originalFilename.replace(/\.[^/.]+$/, '') + '.webp';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

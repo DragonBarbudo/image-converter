@@ -1,0 +1,19 @@
+{
+  "name": "image-converter",
+  "version": "1.0.0",
+  "description": "Netlify serverless function to convert images to WebP format with resizing",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "netlify build"
+  },
+  "keywords": ["image", "webp", "converter", "netlify", "serverless"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sharp": "^0.33.1"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
