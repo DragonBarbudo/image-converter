@@ -601,7 +601,7 @@
                 <div class="doc-section">
                     <h2 data-i18n="quickStart">Quick Start</h2>
                     <p data-i18n="quickStartText">Convert an image in one request:</p>
-                    <div class="code-block">curl -X POST https://your-domain.netlify.app/api/convert-image \
+                    <div class="code-block">curl -X POST https://webp.abrir.xyz/api/convert-image \
   -F "image=@photo.jpg" \
   -o converted.webp</div>
                 </div>
@@ -610,7 +610,7 @@
                 <div class="doc-section">
                     <h2 data-i18n="endpoint">Endpoint</h2>
                     <div class="endpoint">POST /api/convert-image</div>
-                    <p data-i18n="baseUrlInfo">Replace <code style="color: #667eea;">your-domain.netlify.app</code> with your actual domain.</p>
+                    <p data-i18n="baseUrlInfo">Base URL: <code style="color: #667eea;">https://webp.abrir.xyz</code></p>
                 </div>
 
                 <!-- Request -->
@@ -672,7 +672,7 @@
 
                     <div class="example-section">
                         <h4 data-i18n="exampleCurl">cURL</h4>
-                        <div class="code-block">curl -X POST https://your-domain.netlify.app/api/convert-image \
+                        <div class="code-block">curl -X POST https://webp.abrir.xyz/api/convert-image \
   -F "image=@photo.jpg" \
   -F "maxWidth=1920" \
   -o converted.webp</div>
@@ -684,7 +684,7 @@
 formData.append('image', fileInput.files[0]);
 formData.append('maxWidth', '1920');
 
-const response = await fetch('https://your-domain.netlify.app/api/convert-image', {
+const response = await fetch('https://webp.abrir.xyz/api/convert-image', {
   method: 'POST',
   body: formData
 });
@@ -700,7 +700,7 @@ files = {'image': open('photo.jpg', 'rb')}
 data = {'maxWidth': '1920', 'maxHeight': '1080'}
 
 response = requests.post(
-  'https://your-domain.netlify.app/api/convert-image',
+  'https://webp.abrir.xyz/api/convert-image',
   files=files,
   data=data
 )
@@ -725,7 +725,7 @@ with open('converted.webp', 'wb') as f:
                         <strong>2.</strong> <span data-i18n="n8nStep2">Set Method: POST</span>
                     </div>
                     <div class="step-box">
-                        <strong>3.</strong> <span data-i18n="n8nStep3">Set URL: https://your-domain.netlify.app/api/convert-image</span>
+                        <strong>3.</strong> <span data-i18n="n8nStep3">Set URL: https://webp.abrir.xyz/api/convert-image</span>
                     </div>
                     <div class="step-box">
                         <strong>4.</strong> <span data-i18n="n8nStep4">Body Type: Form Data (Multipart)</span>
@@ -832,7 +832,7 @@ with open('converted.webp', 'wb') as f:
                 quickStart: "Quick Start",
                 quickStartText: "Convert an image in one request:",
                 endpoint: "Endpoint",
-                baseUrlInfo: "Replace your-domain.netlify.app with your actual domain.",
+                baseUrlInfo: "Base URL: https://webp.abrir.xyz",
                 requestSection: "Request",
                 requestInfo: "Send multipart/form-data with these fields:",
                 typeFile: "FILE",
@@ -856,7 +856,7 @@ with open('converted.webp', 'wb') as f:
                 n8nSteps: "Setup Steps",
                 n8nStep1: "Add an HTTP Request node",
                 n8nStep2: "Set Method: POST",
-                n8nStep3: "Set URL: https://your-domain.netlify.app/api/convert-image",
+                n8nStep3: "Set URL: https://webp.abrir.xyz/api/convert-image",
                 n8nStep4: "Body Type: Form Data (Multipart)",
                 n8nUseCase: "Common Use Cases",
                 n8nUse1: "Batch convert images from a folder",
@@ -901,7 +901,7 @@ with open('converted.webp', 'wb') as f:
                 quickStart: "Inicio Rápido",
                 quickStartText: "Convierte una imagen en una solicitud:",
                 endpoint: "Endpoint",
-                baseUrlInfo: "Reemplaza your-domain.netlify.app con tu dominio real.",
+                baseUrlInfo: "URL Base: https://webp.abrir.xyz",
                 requestSection: "Solicitud",
                 requestInfo: "Envía multipart/form-data con estos campos:",
                 typeFile: "ARCHIVO",
@@ -925,7 +925,7 @@ with open('converted.webp', 'wb') as f:
                 n8nSteps: "Pasos de Configuración",
                 n8nStep1: "Agrega un nodo HTTP Request",
                 n8nStep2: "Establece Método: POST",
-                n8nStep3: "Establece URL: https://your-domain.netlify.app/api/convert-image",
+                n8nStep3: "Establece URL: https://webp.abrir.xyz/api/convert-image",
                 n8nStep4: "Tipo de Cuerpo: Form Data (Multipart)",
                 n8nUseCase: "Casos de Uso Comunes",
                 n8nUse1: "Convierte por lotes imágenes de una carpeta",
