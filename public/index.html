@@ -600,9 +600,21 @@
                 <!-- Quick Start -->
                 <div class="doc-section">
                     <h2 data-i18n="quickStart">Quick Start</h2>
-                    <p data-i18n="quickStartText">Convert an image in one request:</p>
-                    <div class="code-block">curl -X POST https://webp.abrir.xyz/api/convert-image \
-  -F "image=@photo.jpg" \
+                    <p data-i18n="quickStartText">Convert an image in one request - three ways to send your image:</p>
+                    <div class="code-block"># Upload a file
+curl -X POST https://webp.abrir.xyz/api/convert-image \
+  -F "image=@photo.jpg" -o converted.webp
+
+# From URL
+curl -X POST https://webp.abrir.xyz/api/convert-image \
+  -H "Content-Type: application/json" \
+  -d '{"imageUrl":"https://example.com/image.jpg"}' \
+  -o converted.webp
+
+# From Base64
+curl -X POST https://webp.abrir.xyz/api/convert-image \
+  -H "Content-Type: application/json" \
+  -d '{"imageBase64":"data:image/jpeg;base64,/9j/4AAQ..."}' \
   -o converted.webp</div>
                 </div>
 
@@ -616,12 +628,51 @@
                 <!-- Request -->
                 <div class="doc-section">
                     <h2 data-i18n="requestSection">Request</h2>
-                    <p data-i18n="requestInfo">Send <span class="code-inline">multipart/form-data</span> with these fields:</p>
+                    
+                    <h3 data-i18n="method1">Method 1: File Upload (multipart/form-data)</h3>
                     <div class="param-list">
                         <div class="param-item">
                             <div class="param-name">image *</div>
                             <div class="param-type" data-i18n="typeFile">FILE</div>
                             <div class="param-desc" data-i18n="paramImage">The image file to convert. Accepts JPG, PNG, GIF, TIFF, WebP, etc.</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">maxWidth</div>
+                            <div class="param-type" data-i18n="typeNumber">NUMBER</div>
+                            <div class="param-desc" data-i18n="paramWidth">Maximum width in pixels. Optional. Image scales proportionally if larger.</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">maxHeight</div>
+                            <div class="param-type" data-i18n="typeNumber">NUMBER</div>
+                            <div class="param-desc" data-i18n="paramHeight">Maximum height in pixels. Optional. Image scales proportionally if larger.</div>
+                        </div>
+                    </div>
+
+                    <h3 data-i18n="method2">Method 2: URL (application/json)</h3>
+                    <div class="param-list">
+                        <div class="param-item">
+                            <div class="param-name">imageUrl *</div>
+                            <div class="param-type" data-i18n="typeString">STRING</div>
+                            <div class="param-desc" data-i18n="paramImageUrl">URL of the image to fetch and convert.</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">maxWidth</div>
+                            <div class="param-type" data-i18n="typeNumber">NUMBER</div>
+                            <div class="param-desc" data-i18n="paramWidth">Maximum width in pixels. Optional. Image scales proportionally if larger.</div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-name">maxHeight</div>
+                            <div class="param-type" data-i18n="typeNumber">NUMBER</div>
+                            <div class="param-desc" data-i18n="paramHeight">Maximum height in pixels. Optional. Image scales proportionally if larger.</div>
+                        </div>
+                    </div>
+
+                    <h3 data-i18n="method3">Method 3: Base64 (application/json)</h3>
+                    <div class="param-list">
+                        <div class="param-item">
+                            <div class="param-name">imageBase64 *</div>
+                            <div class="param-type" data-i18n="typeString">STRING</div>
+                            <div class="param-desc" data-i18n="paramImageBase64">Base64 encoded image data (with or without data URI prefix).</div>
                         </div>
                         <div class="param-item">
                             <div class="param-name">maxWidth</div>
@@ -671,7 +722,7 @@
                     <h2 data-i18n="examples">Code Examples</h2>
 
                     <div class="example-section">
-                        <h4 data-i18n="exampleCurl">cURL</h4>
+                        <h4 data-i18n="exampleCurlFile">cURL - File Upload</h4>
                         <div class="code-block">curl -X POST https://webp.abrir.xyz/api/convert-image \
   -F "image=@photo.jpg" \
   -F "maxWidth=1920" \
@@ -679,7 +730,23 @@
                     </div>
 
                     <div class="example-section">
-                        <h4 data-i18n="exampleJs">JavaScript / Node.js</h4>
+                        <h4 data-i18n="exampleCurlUrl">cURL - From URL</h4>
+                        <div class="code-block">curl -X POST https://webp.abrir.xyz/api/convert-image \
+  -H "Content-Type: application/json" \
+  -d '{"imageUrl":"https://example.com/image.jpg","maxWidth":1920}' \
+  -o converted.webp</div>
+                    </div>
+
+                    <div class="example-section">
+                        <h4 data-i18n="exampleCurlBase64">cURL - From Base64</h4>
+                        <div class="code-block">curl -X POST https://webp.abrir.xyz/api/convert-image \
+  -H "Content-Type: application/json" \
+  -d '{"imageBase64":"data:image/jpeg;base64,/9j/4AAQ...","maxWidth":1920}' \
+  -o converted.webp</div>
+                    </div>
+
+                    <div class="example-section">
+                        <h4 data-i18n="exampleJsFile">JavaScript - File Upload</h4>
                         <div class="code-block">const formData = new FormData();
 formData.append('image', fileInput.files[0]);
 formData.append('maxWidth', '1920');
@@ -693,7 +760,21 @@ const blob = await response.blob();</div>
                     </div>
 
                     <div class="example-section">
-                        <h4 data-i18n="examplePython">Python</h4>
+                        <h4 data-i18n="exampleJsUrl">JavaScript - From URL</h4>
+                        <div class="code-block">const response = await fetch('https://webp.abrir.xyz/api/convert-image', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    imageUrl: 'https://example.com/image.jpg',
+    maxWidth: 1920
+  })
+});
+
+const blob = await response.blob();</div>
+                    </div>
+
+                    <div class="example-section">
+                        <h4 data-i18n="examplePythonFile">Python - File Upload</h4>
                         <div class="code-block">import requests
 
 files = {'image': open('photo.jpg', 'rb')}
@@ -703,6 +784,22 @@ response = requests.post(
   'https://webp.abrir.xyz/api/convert-image',
   files=files,
   data=data
+)
+
+with open('converted.webp', 'wb') as f:
+    f.write(response.content)</div>
+                    </div>
+
+                    <div class="example-section">
+                        <h4 data-i18n="examplePythonUrl">Python - From URL</h4>
+                        <div class="code-block">import requests
+
+response = requests.post(
+  'https://webp.abrir.xyz/api/convert-image',
+  json={
+    'imageUrl': 'https://example.com/image.jpg',
+    'maxWidth': 1920
+  }
 )
 
 with open('converted.webp', 'wb') as f:
@@ -830,15 +927,20 @@ with open('converted.webp', 'wb') as f:
                 apiTitle: "API Documentation",
                 apiSubtitle: "Integrate the Image to WebP Converter API into your application",
                 quickStart: "Quick Start",
-                quickStartText: "Convert an image in one request:",
+                quickStartText: "Convert an image in one request - three ways to send your image:",
                 endpoint: "Endpoint",
                 baseUrlInfo: "Base URL: https://webp.abrir.xyz",
                 requestSection: "Request",
-                requestInfo: "Send multipart/form-data with these fields:",
+                method1: "Method 1: File Upload (multipart/form-data)",
+                method2: "Method 2: URL (application/json)",
+                method3: "Method 3: Base64 (application/json)",
                 typeFile: "FILE",
                 typeNumber: "NUMBER",
+                typeString: "STRING",
                 typeBinary: "BINARY",
                 paramImage: "The image file to convert. Accepts JPG, PNG, GIF, TIFF, WebP, etc.",
+                paramImageUrl: "URL of the image to fetch and convert.",
+                paramImageBase64: "Base64 encoded image data (with or without data URI prefix).",
                 paramWidth: "Maximum width in pixels. Optional. Image scales proportionally if larger.",
                 paramHeight: "Maximum height in pixels. Optional. Image scales proportionally if larger.",
                 responseSection: "Response",
@@ -848,9 +950,13 @@ with open('converted.webp', 'wb') as f:
                 headerFinalWidth: "Final image width in pixels",
                 headerFinalHeight: "Final image height in pixels",
                 examples: "Code Examples",
-                exampleCurl: "cURL",
-                exampleJs: "JavaScript / Node.js",
-                examplePython: "Python",
+                exampleCurlFile: "cURL - File Upload",
+                exampleCurlUrl: "cURL - From URL",
+                exampleCurlBase64: "cURL - From Base64",
+                exampleJsFile: "JavaScript - File Upload",
+                exampleJsUrl: "JavaScript - From URL",
+                examplePythonFile: "Python - File Upload",
+                examplePythonUrl: "Python - From URL",
                 n8nIntegration: "Integration",
                 n8nIntro: "Automate image conversion in your n8n workflows.",
                 n8nSteps: "Setup Steps",
@@ -899,15 +1005,20 @@ with open('converted.webp', 'wb') as f:
                 apiTitle: "Documentación de API",
                 apiSubtitle: "Integra el API del Convertidor de Imágenes a WebP en tu aplicación",
                 quickStart: "Inicio Rápido",
-                quickStartText: "Convierte una imagen en una solicitud:",
+                quickStartText: "Convierte una imagen en una solicitud - tres formas de enviar tu imagen:",
                 endpoint: "Endpoint",
                 baseUrlInfo: "URL Base: https://webp.abrir.xyz",
                 requestSection: "Solicitud",
-                requestInfo: "Envía multipart/form-data con estos campos:",
+                method1: "Método 1: Carga de Archivo (multipart/form-data)",
+                method2: "Método 2: URL (application/json)",
+                method3: "Método 3: Base64 (application/json)",
                 typeFile: "ARCHIVO",
                 typeNumber: "NÚMERO",
+                typeString: "TEXTO",
                 typeBinary: "BINARIO",
                 paramImage: "El archivo de imagen a convertir. Acepta JPG, PNG, GIF, TIFF, WebP, etc.",
+                paramImageUrl: "URL de la imagen a descargar y convertir.",
+                paramImageBase64: "Datos de imagen codificados en Base64 (con o sin prefijo data URI).",
                 paramWidth: "Ancho máximo en píxeles. Opcional. La imagen se escala proporcionalmente si es mayor.",
                 paramHeight: "Altura máxima en píxeles. Opcional. La imagen se escala proporcionalmente si es mayor.",
                 responseSection: "Respuesta",
@@ -917,9 +1028,13 @@ with open('converted.webp', 'wb') as f:
                 headerFinalWidth: "Ancho final de la imagen en píxeles",
                 headerFinalHeight: "Altura final de la imagen en píxeles",
                 examples: "Ejemplos de Código",
-                exampleCurl: "cURL",
-                exampleJs: "JavaScript / Node.js",
-                examplePython: "Python",
+                exampleCurlFile: "cURL - Carga de Archivo",
+                exampleCurlUrl: "cURL - Desde URL",
+                exampleCurlBase64: "cURL - Desde Base64",
+                exampleJsFile: "JavaScript - Carga de Archivo",
+                exampleJsUrl: "JavaScript - Desde URL",
+                examplePythonFile: "Python - Carga de Archivo",
+                examplePythonUrl: "Python - Desde URL",
                 n8nIntegration: "Integración",
                 n8nIntro: "Automatiza la conversión de imágenes en tus flujos de trabajo de n8n.",
                 n8nSteps: "Pasos de Configuración",

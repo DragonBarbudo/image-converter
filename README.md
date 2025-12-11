@@ -1,6 +1,8 @@
 # 🖼️ Image to WebP Converter
 
-A Netlify serverless function that converts images to WebP format with optional resizing while maintaining aspect ratio.
+A Netlify serverless API that converts images to WebP format with optional resizing while maintaining aspect ratio. Supports three input methods: file upload, URL, and Base64.
+
+🌐 **Live Demo:** https://webp.abrir.xyz/
 
 ## ✨ Features
 
@@ -8,8 +10,10 @@ A Netlify serverless function that converts images to WebP format with optional 
 - 📐 Resize images with aspect ratio preservation
 - 🎯 Specify max width OR max height (or both)
 - 🚀 Fast processing with Sharp library
-- 🌐 Easy-to-use web interface
+- 🌐 Easy-to-use web interface with bilingual docs (EN/ES)
+- 📡 Three input methods: File upload, URL, or Base64
 - ☁️ Serverless deployment on Netlify
+- 🔗 Perfect for n8n workflows and automation
 
 ## 🚀 Quick Start
 
@@ -69,55 +73,115 @@ netlify deploy --prod
 ### Endpoint
 
 ```
-POST /api/convert-image
+POST https://webp.abrir.xyz/api/convert-image
 ```
 
-### Request
+### Input Methods
 
-Send a `multipart/form-data` POST request with the following fields:
-
-- `image` (required): The image file to convert
-- `maxWidth` (optional): Maximum width in pixels
-- `maxHeight` (optional): Maximum height in pixels
-
-### Example with cURL
+#### Method 1: File Upload (multipart/form-data)
 
 ```bash
-# Convert without resizing
-curl -X POST https://your-site.netlify.app/api/convert-image \
-  -F "image=@photo.jpg"
-
-# Convert with max width
-curl -X POST https://your-site.netlify.app/api/convert-image \
-  -F "image=@photo.jpg" \
-  -F "maxWidth=1920"
-
-# Convert with max height
-curl -X POST https://your-site.netlify.app/api/convert-image \
-  -F "image=@photo.jpg" \
-  -F "maxHeight=1080"
-
-# Convert with both (image will fit within bounds)
-curl -X POST https://your-site.netlify.app/api/convert-image \
+curl -X POST https://webp.abrir.xyz/api/convert-image \
   -F "image=@photo.jpg" \
   -F "maxWidth=1920" \
-  -F "maxHeight=1080"
+  -o converted.webp
 ```
 
-### Example with JavaScript
+**Parameters:**
+- `image` (required) - Image file
+- `maxWidth` (optional) - Maximum width in pixels
+- `maxHeight` (optional) - Maximum height in pixels
+
+#### Method 2: From URL (application/json)
+
+```bash
+curl -X POST https://webp.abrir.xyz/api/convert-image \
+  -H "Content-Type: application/json" \
+  -d '{"imageUrl":"https://example.com/image.jpg","maxWidth":1920}' \
+  -o converted.webp
+```
+
+**JSON Body:**
+- `imageUrl` (required) - URL of the image to fetch
+- `maxWidth` (optional) - Maximum width in pixels
+- `maxHeight` (optional) - Maximum height in pixels
+
+#### Method 3: From Base64 (application/json)
+
+```bash
+curl -X POST https://webp.abrir.xyz/api/convert-image \
+  -H "Content-Type: application/json" \
+  -d '{"imageBase64":"data:image/jpeg;base64,/9j/4AAQ...","maxWidth":1920}' \
+  -o converted.webp
+```
+
+**JSON Body:**
+- `imageBase64` (required) - Base64 encoded image (with or without data URI prefix)
+- `maxWidth` (optional) - Maximum width in pixels
+- `maxHeight` (optional) - Maximum height in pixels
+
+### JavaScript Examples
 
 ```javascript
+// File upload
 const formData = new FormData();
 formData.append('image', fileInput.files[0]);
 formData.append('maxWidth', '1920');
 
-const response = await fetch('/api/convert-image', {
+const response = await fetch('https://webp.abrir.xyz/api/convert-image', {
   method: 'POST',
   body: formData
 });
 
 const blob = await response.blob();
 const imageUrl = URL.createObjectURL(blob);
+```
+
+```javascript
+// From URL
+const response = await fetch('https://webp.abrir.xyz/api/convert-image', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    imageUrl: 'https://example.com/image.jpg',
+    maxWidth: 1920
+  })
+});
+
+const blob = await response.blob();
+```
+
+### Python Examples
+
+```python
+import requests
+
+# File upload
+files = {'image': open('photo.jpg', 'rb')}
+data = {'maxWidth': '1920'}
+
+response = requests.post(
+  'https://webp.abrir.xyz/api/convert-image',
+  files=files,
+  data=data
+)
+
+with open('converted.webp', 'wb') as f:
+    f.write(response.content)
+```
+
+```python
+# From URL
+response = requests.post(
+  'https://webp.abrir.xyz/api/convert-image',
+  json={
+    'imageUrl': 'https://example.com/image.jpg',
+    'maxWidth': 1920
+  }
+)
+
+with open('converted.webp', 'wb') as f:
+    f.write(response.content)
 ```
 
 ### Response
@@ -136,6 +200,25 @@ const imageUrl = URL.createObjectURL(blob);
     "message": "Detailed error information"
   }
   ```
+
+## 🔗 n8n Integration
+
+Perfect for workflow automation! Use the HTTP Request node to integrate with n8n:
+
+1. Add an **HTTP Request** node
+2. Set **Method:** POST
+3. Set **URL:** `https://webp.abrir.xyz/api/convert-image`
+4. Choose your method:
+   - **For files:** Set Body Type to "Form Data (Multipart)" and connect binary data
+   - **For URLs:** Set Body Type to "JSON" and use `{"imageUrl": "..."}`
+5. Add `maxWidth`/`maxHeight` as needed
+
+**Common Use Cases:**
+- Batch convert images from folders
+- Auto-convert email attachments
+- Sync and resize from cloud storage (Google Drive, Dropbox)
+- Create webhooks for on-demand conversion
+- Send converted images to Slack/Discord
 
 ## 📁 Project Structure
 

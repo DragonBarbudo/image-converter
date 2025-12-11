@@ -6,10 +6,17 @@
   "scripts": {
     "dev": "netlify dev"
   },
-  "keywords": ["image", "webp", "converter", "netlify", "serverless"],
+  "keywords": [
+    "image",
+    "webp",
+    "converter",
+    "netlify",
+    "serverless"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "node-fetch": "^2.7.0",
     "sharp": "^0.33.1"
   },
   "devDependencies": {

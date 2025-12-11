@@ -30,43 +30,87 @@ exports.handler = async (event, context) => {
     // Parse the request body
     const contentType = event.headers['content-type'] || event.headers['Content-Type'] || '';
     
-    if (!contentType.includes('multipart/form-data')) {
+    let imageBuffer;
+    let maxWidth = null;
+    let maxHeight = null;
+
+    // Support multiple input formats: multipart/form-data, application/json, or JSON with URL/base64
+    if (contentType.includes('application/json')) {
+      // Parse JSON body
+      const body = JSON.parse(event.body);
+      
+      if (body.imageUrl) {
+        // Fetch image from URL
+        const fetch = require('node-fetch');
+        const response = await fetch(body.imageUrl);
+        if (!response.ok) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Failed to fetch image from URL' }),
+          };
+        }
+        imageBuffer = Buffer.from(await response.arrayBuffer());
+      } else if (body.imageBase64) {
+        // Decode base64 image
+        const base64Data = body.imageBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+        imageBuffer = Buffer.from(base64Data, 'base64');
+      } else if (body.image) {
+        // Support 'image' field for base64 as well
+        const base64Data = body.image.replace(/^data:image\/[a-z]+;base64,/, '');
+        imageBuffer = Buffer.from(base64Data, 'base64');
+      } else {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ 
+            error: 'No image provided',
+            usage: 'Include imageUrl, imageBase64, or image field in JSON body'
+          }),
+        };
+      }
+
+      maxWidth = body.maxWidth ? parseInt(body.maxWidth, 10) : null;
+      maxHeight = body.maxHeight ? parseInt(body.maxHeight, 10) : null;
+
+    } else if (contentType.includes('multipart/form-data')) {
+      // Parse multipart form data (existing logic)
+      const boundary = contentType.split('boundary=')[1];
+      if (!boundary) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid multipart/form-data boundary' }),
+        };
+      }
+
+      const parts = parseMultipartFormData(event.body, boundary, event.isBase64Encoded);
+      
+      if (!parts.image) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ 
+            error: 'No image file provided',
+            usage: 'Include an image file in the "image" field'
+          }),
+        };
+      }
+
+      imageBuffer = parts.image;
+      maxWidth = parts.maxWidth ? parseInt(parts.maxWidth, 10) : null;
+      maxHeight = parts.maxHeight ? parseInt(parts.maxHeight, 10) : null;
+
+    } else {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ 
-          error: 'Content-Type must be multipart/form-data',
-          usage: 'Send image file with optional maxWidth or maxHeight parameters'
+          error: 'Content-Type must be multipart/form-data or application/json',
+          usage: 'Send image file, imageUrl, or imageBase64 with optional maxWidth or maxHeight parameters'
         }),
       };
     }
-
-    // Parse multipart form data
-    const boundary = contentType.split('boundary=')[1];
-    if (!boundary) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Invalid multipart/form-data boundary' }),
-      };
-    }
-
-    const parts = parseMultipartFormData(event.body, boundary, event.isBase64Encoded);
-    
-    if (!parts.image) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'No image file provided',
-          usage: 'Include an image file in the "image" field'
-        }),
-      };
-    }
-
-    // Get resize parameters
-    const maxWidth = parts.maxWidth ? parseInt(parts.maxWidth, 10) : null;
-    const maxHeight = parts.maxHeight ? parseInt(parts.maxHeight, 10) : null;
 
     // Validate parameters
     if (maxWidth && (isNaN(maxWidth) || maxWidth <= 0)) {
@@ -86,7 +130,7 @@ exports.handler = async (event, context) => {
     }
 
     // Process the image with sharp
-    let pipeline = sharp(parts.image);
+    let pipeline = sharp(imageBuffer);
 
     // Get image metadata to determine if resizing is needed
     const metadata = await pipeline.metadata();
