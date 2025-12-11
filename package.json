@@ -4,8 +4,7 @@
   "description": "Netlify serverless function to convert images to WebP format with resizing",
   "main": "index.js",
   "scripts": {
-    "dev": "netlify dev",
-    "build": "netlify build"
+    "dev": "netlify dev"
   },
   "keywords": ["image", "webp", "converter", "netlify", "serverless"],
   "author": "",
