@@ -33,6 +33,13 @@ exports.handler = async (event, context) => {
     let imageBuffer;
     let maxWidth = null;
     let maxHeight = null;
+    let format = 'webp';
+    // Auto-detect format from host
+    const host = (event.headers['x-forwarded-host'] || event.headers['host'] || '').toLowerCase();
+    if (!format) format = 'webp';
+    if (host.startsWith('avif.') || host.includes('://avif.')) format = 'avif';
+    else if (host.startsWith('webp.') || host.includes('://webp.')) format = 'webp';
+    else format = 'avif'; // default to avif for other hosts
 
     // Support multiple input formats: multipart/form-data, application/json, or JSON with URL/base64
     if (contentType.includes('application/json')) {
@@ -72,6 +79,10 @@ exports.handler = async (event, context) => {
 
       maxWidth = body.maxWidth ? parseInt(body.maxWidth, 10) : null;
       maxHeight = body.maxHeight ? parseInt(body.maxHeight, 10) : null;
+      if (body.format && typeof body.format === 'string') {
+        const f = body.format.toLowerCase();
+        if (f === 'avif' || f === 'webp') format = f;
+      }
 
     } else if (contentType.includes('multipart/form-data')) {
       // Parse multipart form data (existing logic)
@@ -100,6 +111,10 @@ exports.handler = async (event, context) => {
       imageBuffer = parts.image;
       maxWidth = parts.maxWidth ? parseInt(parts.maxWidth, 10) : null;
       maxHeight = parts.maxHeight ? parseInt(parts.maxHeight, 10) : null;
+      if (parts.format) {
+        const f = String(parts.format).toLowerCase();
+        if (f === 'avif' || f === 'webp') format = f;
+      }
 
     } else {
       return {
@@ -166,27 +181,38 @@ exports.handler = async (event, context) => {
       pipeline = pipeline.resize(resizeOptions);
     }
 
-    // Convert to WebP
-    const webpBuffer = await pipeline
-      .webp({ quality: 80 })
-      .toBuffer();
+    // Output format selection: default webp, optional avif
+    const outputFormat = format;
+    const formatParam = outputFormat;
 
-    // Get final image info
-    const finalMetadata = await sharp(webpBuffer).metadata();
+    let outBuffer;
+    let finalMetadata;
+    const selectedFormat = formatParam || 'webp';
+
+    if (selectedFormat === 'avif') {
+      outBuffer = await pipeline.avif({ quality: 60 }).toBuffer();
+      finalMetadata = await sharp(outBuffer).metadata();
+    } else {
+      outBuffer = await pipeline.webp({ quality: 80 }).toBuffer();
+      finalMetadata = await sharp(outBuffer).metadata();
+    }
+
+    // finalMetadata already computed from outBuffer
 
     // Return the converted image
     return {
       statusCode: 200,
       headers: {
         ...headers,
-        'Content-Type': 'image/webp',
-        'Content-Disposition': 'inline; filename="converted.webp"',
+        'Content-Type': selectedFormat === 'avif' ? 'image/avif' : 'image/webp',
+        'Content-Disposition': selectedFormat === 'avif' ? 'inline; filename="converted.avif"' : 'inline; filename="converted.webp"',
         'X-Original-Width': metadata.width.toString(),
         'X-Original-Height': metadata.height.toString(),
         'X-Final-Width': finalMetadata.width.toString(),
         'X-Final-Height': finalMetadata.height.toString(),
+        'X-Output-Format': selectedFormat,
       },
-      body: webpBuffer.toString('base64'),
+      body: outBuffer.toString('base64'),
       isBase64Encoded: true,
     };
 
